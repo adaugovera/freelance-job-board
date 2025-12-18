@@ -1,0 +1,209 @@
+/* Modern UI stylesheet for Freelance Job Board
+  Features:
+  - CSS variables for light/dark themes
+  - Responsive layout utilities
+  - Mobile dropdown / hamburger menu styles
+  - Pagination styles
+  - Toast/notification styles with CSS3 animations
+  - AOS-friendly utilities
+  Refined palette, fonts, and animations for clarity and balance
+*/
+
+/* Load a clean, professional UI font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+:root {
+  /* Refined accessible palette */
+  --bg: #fbfdff; /* very light */
+  --surface: #ffffff;
+  --text: #0b1320; /* near-black for max contrast */
+  --muted: #546072; /* soft slate */
+  --primary: #1765d1; /* strong but friendly blue */
+  --primary-600: #0f4fb0;
+  --accent: #00a991; /* warm teal accent */
+  --success: #0ea57a;
+  --danger: #e04545;
+  --glass: rgba(255,255,255,0.65);
+  --shadow: 0 8px 26px rgba(13,52,96,0.08);
+  --radius: 12px;
+  --container: 1120px;
+  --header-height: 72px;
+}
+
+.theme-dark {
+  --bg: #071226;
+  --surface: #071528;
+  --text: #e7f1fb;
+  --muted: #9fb0bf;
+  --primary: #4ea8ff;
+  --primary-600: #3b8de0;
+  --glass: rgba(9,26,43,0.6);
+  --shadow: 0 10px 30px rgba(0,0,0,0.55);
+}
+
+/* Base */
+html,body,#root{height:100%;}
+body{
+  font-family: 'Poppins', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  margin:0;
+  background: linear-gradient(180deg,var(--bg) 0%, rgba(250,252,255,0.6) 60%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.55;
+}
+
+.container{max-width:var(--container);margin:0 auto;padding:1rem;}
+
+/* site container aligns content symmetrically */
+.site-container{max-width:var(--container);margin:0 auto;padding:1.25rem;padding-top:calc(var(--header-height) + 1rem)}
+
+
+/* Header / Navbar */
+.site-header{
+  display:flex;align-items:center;justify-content:center;height:var(--header-height);padding:0 1rem;border-radius:0 0 14px 14px;
+  background:var(--surface); /* solid surface - opaque */
+  box-shadow:var(--shadow);
+  border-bottom:1px solid rgba(13,20,30,0.04);
+  position:sticky;top:8px;z-index:1000; /* ensure header sits above all content */
+  transform:translateY(-6px);opacity:0; /* animated in */
+  animation:headerDrop .42s cubic-bezier(.2,.9,.28,1) forwards;
+  overflow:hidden; /* prevent children (logo) from overflowing */
+}
+.site-header .container{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:.9rem;font-weight:700}
+.brand .logo{width:40px;height:40px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:800;padding:6px;transition:transform .22s cubic-bezier(.2,.9,.28,1);overflow:hidden}
+.brand .logo svg{width:22px;height:22px;display:block}
+.brand .logo:hover{transform:scale(1.035)}
+.brand .wordmark{font-size:1.28rem;letter-spacing:0.2px;font-family:'Playfair Display', serif}
+
+.nav-links{display:flex;gap:1rem;align-items:center}
+.nav-links a{color:var(--text);text-decoration:none;padding:.65rem .9rem;border-radius:10px;font-weight:700;position:relative;font-size:1.02rem;background:transparent}
+.nav-links a::after{content:'';position:absolute;left:12%;bottom:6px;height:3px;width:0;background:linear-gradient(90deg,var(--primary),var(--primary-600));border-radius:3px;transition:width .22s ease}
+.nav-links a:hover{transform:translateY(-3px);transition:transform .18s cubic-bezier(.2,.9,.28,1);}
+.nav-links a:hover::after{width:76%}
+
+/* Hover backgrounds tuned per theme so contrast is preserved and remains visible */
+.nav-links a:hover{background:rgba(23,101,209,0.12)}
+.theme-dark .nav-links a:hover{background:rgba(255,255,255,0.12)}
+
+/* active link style */
+.nav-links a[aria-current='page'],.nav-links a.active{color:var(--primary);}
+
+.nav-link.nav-cta{background:linear-gradient(90deg,var(--primary),var(--primary-600));color:white;padding:.55rem .85rem;box-shadow:0 10px 30px rgba(23,101,209,0.12);transition:transform .12s ease, box-shadow .12s ease}
+.nav-link.nav-cta:hover{transform:translateY(-3px);box-shadow:0 20px 48px rgba(23,101,209,0.18)}
+/* Ensure CTA remains high contrast in dark theme */
+.theme-dark .nav-link.nav-cta{color:white}
+
+
+/* Mobile hamburger */
+.hamburger{display:none;background:transparent;border:0;padding:.3rem;border-radius:8px}
+.hamburger .bar{width:22px;height:2px;background:var(--text);display:block;margin:4px 0;border-radius:2px}
+.mobile-menu{display:none;position:absolute;right:1rem;top:64px;background:var(--surface);padding:.5rem;border-radius:10px;box-shadow:var(--shadow)}
+.mobile-menu a{display:block;padding:.5rem 0;color:var(--text)}
+
+/* Cards and job item */
+.card{background:var(--surface);padding:1rem;border-radius:12px;box-shadow:var(--shadow);color:var(--text)}
+.card h2{margin:0 0 .5rem 0}
+.job-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;align-items:start}
+.job-card{border-radius:12px;padding:1rem;border:1px solid rgba(13,20,30,0.06);background:var(--surface);color:var(--text)}
+.job-card .job-card__title{font-size:1.06rem;margin:0 0 .45rem;font-weight:700}
+.job-card .job-card__desc{color:var(--muted);margin:0 0 .75rem}
+.job-card .job-card__meta{display:flex;justify-content:space-between;align-items:center}
+.job-item{padding:1rem;border-radius:10px;border:1px solid rgba(15,23,36,0.04);display:flex;flex-direction:column;gap:.5rem}
+.job-item .meta{font-size:.85rem;color:var(--muted)}
+
+/* Responsive grid */
+@media (max-width:1100px){
+  .job-list{grid-template-columns:repeat(1,1fr)}
+}
+@media (max-width:900px){
+  .hamburger{display:block}
+  .nav-links{display:none}
+  .mobile-menu{display:block}
+}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem .95rem;border-radius:10px;border:0;cursor:pointer;background:var(--primary);color:white;font-weight:700;box-shadow:0 12px 30px rgba(23,101,209,0.08);transition:transform .12s ease, box-shadow .12s ease}
+.btn:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(23,101,209,0.12)}
+.btn:active{transform:translateY(-1px) scale(.995)}
+.btn.secondary{background:transparent;color:var(--primary);border:1px solid rgba(15,23,36,0.06)}
+.btn-cta{background:linear-gradient(90deg,var(--primary),var(--primary-600));color:white;padding:.6rem .85rem;border-radius:10px;font-weight:700}
+
+/* subtle pulse for active/important elements */
+.active-pulse{animation:activePulse 2.4s ease-in-out infinite}
+@keyframes activePulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.02);opacity:.98}100%{transform:scale(1);opacity:1}}
+
+/* Header entrance animation */
+@keyframes headerDrop{0%{transform:translateY(-10px);opacity:0}100%{transform:none;opacity:1}}
+
+/* Pagination */
+.pagination{display:flex;list-style:none;padding:0;gap:.45rem;align-items:center}
+.pagination li{background:var(--surface);padding:.55rem .85rem;border-radius:10px;cursor:pointer;color:var(--text);border:1px solid rgba(15,23,36,0.04);font-weight:600}
+.pagination li.active{background:linear-gradient(90deg,var(--primary),var(--primary-600));color:white;box-shadow:0 10px 26px rgba(23,101,209,0.12)}
+.pagination li:hover{transform:translateY(-3px);transition:transform .15s ease}
+.pagination li.disabled{opacity:.5;cursor:not-allowed}
+
+/* Forms */
+.form-control{display:flex;flex-direction:column;gap:.45rem}
+.form-card{background:var(--surface);padding:1.05rem;border-radius:12px;border:1px solid rgba(15,23,36,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.04);max-width:820px;margin:0 auto}
+.form-control input,.form-control textarea,select{padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(15,23,36,0.08);background:linear-gradient(180deg,rgba(250,252,255,0.9),rgba(255,255,255,0.98))}
+.form-control label{font-weight:600;color:var(--muted);font-size:.95rem}
+.form-row{margin-bottom:.8rem}
+.input{width:100%;box-sizing:border-box}
+.form-card textarea{min-height:120px}
+
+/* Input focus and validation */
+input:focus,textarea:focus,select:focus{outline:none;box-shadow:0 6px 20px rgba(23,101,209,0.08);border-color:var(--primary-600)}
+
+/* compact responsive forms */
+@media (max-width:600px){
+  .form-card{padding:.85rem;margin:0 12px}
+}
+
+/* Toast/Notification */
+.toast-container{position:fixed;right:1rem;top:1rem;display:flex;flex-direction:column;gap:.6rem;z-index:9999}
+.toast{min-width:260px;padding:.8rem 1rem;border-radius:10px;color:white;display:flex;gap:.6rem;align-items:flex-start;box-shadow:0 10px 30px rgba(2,6,23,0.12);opacity:0}
+.toast .t-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.toast.success{background:linear-gradient(90deg,var(--success),#059669)}
+.toast.info{background:linear-gradient(90deg,var(--primary),var(--primary-600))}
+.toast.warn{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.toast.error{background:linear-gradient(90deg,var(--danger),#b91c1c)}
+
+/* Toast animations */
+@keyframes slideInUp{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}
+@keyframes slideOutUp{from{transform:none;opacity:1}to{transform:translateY(-10px);opacity:0}}
+.toast.show{animation:slideInUp .28s forwards}
+.toast.hide{animation:slideOutUp .22s forwards}
+
+/* Theme toggle widget */
+.theme-toggle{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem;background:var(--surface);border-radius:999px;border:1px solid rgba(15,23,36,0.04)}
+.theme-toggle button{background:transparent;border:0;padding:.4rem;border-radius:999px;cursor:pointer}
+
+/* Footer */
+.site-footer{margin-top:2.25rem;padding:1.25rem 0;background:linear-gradient(180deg, rgba(23,101,209,0.03), rgba(0,0,0,0));border-top:1px solid rgba(15,23,36,0.04)}
+.site-footer .container{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.footer-links{display:flex;gap:1rem;align-items:center}
+.footer-links a{color:var(--muted);text-decoration:none;font-weight:600}
+.footer-copy{color:var(--muted);font-size:.95rem}
+
+
+/* AOS helpers (AOS will add classes itself; these are small helpers) */
+.aos-fade{opacity:0;transform:translateY(8px);}
+.aos-fade.aos-animate{opacity:1;transform:none;transition:opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1)}
+
+/* Utilities */
+.muted{color:var(--muted)}
+.shadow-soft{box-shadow:var(--shadow)}
+.rounded{border-radius:var(--radius)}
+
+/* Accessibility focus */
+a:focus,button:focus,input:focus{outline:3px solid rgba(11,118,255,0.12);outline-offset:2px}
+
+/* Small-screen dropdown: use with JS to toggle .open */
+.mobile-menu{transition:transform .2s ease,opacity .2s ease}
+.mobile-menu.closed{opacity:0;transform:translateY(-6px);pointer-events:none}
+.mobile-menu.open{opacity:1;transform:none}
+
+/* End of ui.css */

@@ -1,0 +1,20 @@
+.profile-page { padding: 8px 0; }
+.profile-card { margin-top: 16px; }
+.profile-form .label { display:block; margin-bottom:6px; font-weight:600; color: #0f172a; }
+.form-actions { text-align: right; margin-top: 8px; }
+.success { color: #059669; }
+.error { color: #dc2626; }
+
+.profile-view { display:flex; gap: 1rem; align-items:flex-start; }
+.profile-avatar { flex: 0 0 92px; }
+.avatar-svg { width: 92px; height: 92px; border-radius: 10px; display:block; }
+.profile-info { flex:1; }
+.profile-name { margin: 0 0 6px 0; }
+.profile-meta { display:flex; gap: .75rem; margin-bottom: .5rem; }
+.profile-bio { margin: .5rem 0; color: #334155; }
+.profile-skills { margin: .25rem 0; color: #334155; font-weight:600; }
+
+@media (max-width: 520px) {
+  .narrow { padding: 0 12px; }
+}
+
