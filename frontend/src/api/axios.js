@@ -1,7 +1,7 @@
 import axios from "axios";
 // Create API client. Use local backend during dev; allow override with VITE_API_URL.
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "https://freelance-web-app.vercel.app"),
+  baseURL: import.meta.env.VITE_API_URL || "https://freelance-web-app.vercel.app",
   timeout: 8000,
 });
 
