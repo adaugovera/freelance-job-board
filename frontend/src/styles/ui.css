@@ -43,7 +43,9 @@
 }
 
 /* Base */
-html,body,#root{height:100%;}
+/* Use border-box everywhere to avoid overflow surprises */
+*,*::before,*::after{box-sizing:border-box}
+html,body,#root{height:100%;overflow-x:hidden}
 body{
   font-family: 'Poppins', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   margin:0;
@@ -52,6 +54,8 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   line-height:1.55;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering:optimizeLegibility;
 }
 
 .container{max-width:var(--container);margin:0 auto;padding:1rem;}
@@ -76,10 +80,10 @@ body{
 .brand .logo{width:40px;height:40px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:800;padding:6px;transition:transform .22s cubic-bezier(.2,.9,.28,1);overflow:hidden}
 .brand .logo svg{width:22px;height:22px;display:block}
 .brand .logo:hover{transform:scale(1.035)}
-.brand .wordmark{font-size:1.28rem;letter-spacing:0.2px;font-family:'Playfair Display', serif}
+.brand .wordmark{font-size:1.28rem;letter-spacing:0.2px;font-family:'Playfair Display', serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;display:inline-block;vertical-align:middle}
 
 .nav-links{display:flex;gap:1rem;align-items:center}
-.nav-links a{color:var(--text);text-decoration:none;padding:.65rem .9rem;border-radius:10px;font-weight:700;position:relative;font-size:1.02rem;background:transparent}
+.nav-links a{color:var(--text);text-decoration:none;padding:.65rem .9rem;border-radius:10px;font-weight:700;position:relative;font-size:1.02rem;background:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
 .nav-links a::after{content:'';position:absolute;left:12%;bottom:6px;height:3px;width:0;background:linear-gradient(90deg,var(--primary),var(--primary-600));border-radius:3px;transition:width .22s ease}
 .nav-links a:hover{transform:translateY(-3px);transition:transform .18s cubic-bezier(.2,.9,.28,1);}
 .nav-links a:hover::after{width:76%}
@@ -100,8 +104,23 @@ body{
 /* Mobile hamburger */
 .hamburger{display:none;background:transparent;border:0;padding:.3rem;border-radius:8px}
 .hamburger .bar{width:22px;height:2px;background:var(--text);display:block;margin:4px 0;border-radius:2px}
-.mobile-menu{display:none;position:absolute;right:1rem;top:64px;background:var(--surface);padding:.5rem;border-radius:10px;box-shadow:var(--shadow)}
-.mobile-menu a{display:block;padding:.5rem 0;color:var(--text)}
+
+/* Backdrop shown when mobile menu is open */
+.mobile-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);z-index:3000;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.mobile-backdrop.open{opacity:1;pointer-events:auto}
+
+/* Compact popover mobile menu anchored near the hamburger */
+.mobile-menu{display:none;position:absolute;top:calc(var(--header-height) + 10px);right:1rem;left:auto;width:min(320px,92%);background:var(--surface);padding:8px;border-radius:12px;box-shadow:0 18px 40px rgba(2,6,23,0.16);z-index:3001;transform:translateY(-6px) scale(.98);opacity:0;transition:transform .18s cubic-bezier(.2,.9,.28,1), opacity .14s ease;pointer-events:none;max-height:60vh;overflow:auto}
+.mobile-menu.open{transform:none;opacity:1;pointer-events:auto;display:block}
+.mobile-menu.closed{transform:translateY(-6px) scale(.98);opacity:0;pointer-events:none}
+.mobile-menu a{display:block;padding:10px 12px;border-radius:8px;margin:6px 0;color:var(--text);font-weight:700;background:transparent;border-left:3px solid transparent}
+.mobile-menu a:focus, .mobile-menu a:hover{background:rgba(23,101,209,0.06);border-left-color:var(--primary);outline:none}
+.mobile-menu::after{content:'';position:absolute;top:-8px;right:18px;border:8px solid transparent;border-bottom-color:var(--surface);filter:drop-shadow(0 -1px 0 rgba(2,6,23,0.04));}
+
+@media (max-width:900px){
+  .mobile-menu{display:block}
+  .nav-links{display:none}
+}
 
 /* Cards and job item */
 .card{background:var(--surface);padding:1rem;border-radius:12px;box-shadow:var(--shadow);color:var(--text)}
@@ -122,6 +141,24 @@ body{
   .hamburger{display:block}
   .nav-links{display:none}
   .mobile-menu{display:block}
+  .site-header{padding:0.6rem 0.8rem;height:auto}
+  .site-header .container{flex-wrap:wrap;align-items:center}
+}
+@media (max-width:520px){
+  .job-list{grid-template-columns:1fr}
+  .nav-links a{font-size:.95rem;padding:.5rem .6rem}
+
+  /* PROFILE: stack and breathe on small screens */
+  .profile-page .form-card.profile-card{padding:1rem;margin:0 12px}
+  .profile-view{flex-direction:column;align-items:center;gap:1rem}
+  .profile-avatar{flex:0 0 auto;margin-bottom:.25rem}
+  .avatar-svg{width:84px;height:84px}
+  .profile-info{width:100%;text-align:left}
+  .profile-meta{display:flex;flex-direction:column;gap:.35rem;align-items:flex-start}
+  .profile-bio,.profile-skills{margin-top:.5rem}
+  /* make action buttons stack and fill width on mobile */
+  .form-actions{display:flex;flex-direction:column;gap:.6rem;width:100%}
+  .form-actions .btn{width:100%;justify-content:center}
 }
 
 /* Buttons */
@@ -130,6 +167,11 @@ body{
 .btn:active{transform:translateY(-1px) scale(.995)}
 .btn.secondary{background:transparent;color:var(--primary);border:1px solid rgba(15,23,36,0.06)}
 .btn-cta{background:linear-gradient(90deg,var(--primary),var(--primary-600));color:white;padding:.6rem .85rem;border-radius:10px;font-weight:700}
+
+/* Small inline spinner used inside buttons */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.28);border-top-color:rgba(255,255,255,0.95);border-radius:50%;animation:spin .9s linear infinite;vertical-align:middle;margin-right:.5rem}
+.theme-dark .spinner{border:2px solid rgba(0,0,0,0.18);border-top-color:var(--primary)}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* subtle pulse for active/important elements */
 .active-pulse{animation:activePulse 2.4s ease-in-out infinite}
@@ -147,19 +189,57 @@ body{
 
 /* Forms */
 .form-control{display:flex;flex-direction:column;gap:.45rem}
-.form-card{background:var(--surface);padding:1.05rem;border-radius:12px;border:1px solid rgba(15,23,36,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.04);max-width:820px;margin:0 auto}
-.form-control input,.form-control textarea,select{padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(15,23,36,0.08);background:linear-gradient(180deg,rgba(250,252,255,0.9),rgba(255,255,255,0.98))}
-.form-control label{font-weight:600;color:var(--muted);font-size:.95rem}
-.form-row{margin-bottom:.8rem}
-.input{width:100%;box-sizing:border-box}
+/* modern form card: full width on small screens, centered on larger */
+.form-card{background:var(--surface);padding:1.05rem;border-radius:12px;border:1px solid rgba(15,23,36,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.04);max-width:820px;margin:0 auto;width:100%}
+
+/* Label and input styles: left-aligned labels, better contrast, and interactive focus */
+.label, .form-control label{display:block;font-weight:700;color:var(--text);font-size:.95rem;text-align:left;margin-bottom:.35rem}
+.input, textarea, select{padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(15,23,36,0.08);background:linear-gradient(180deg,rgba(250,252,255,0.95),rgba(255,255,255,0.99));min-width:0}
+.input::placeholder{color:rgba(11,17,32,0.35)}
+.input:focus, textarea:focus, select:focus{outline:none;box-shadow:0 10px 30px rgba(23,101,209,0.09);border-color:var(--primary-600);transform:translateY(-1px)}
+
+/* form rows default to stacked but support an inline variant for larger screens */
+.form-row{margin-bottom:.8rem;display:flex;width:100%;flex-direction:column;align-items:flex-start}
+@media (min-width:900px){
+  .form-row.inline{flex-direction:row;align-items:center;gap:1rem}
+  .form-row.inline .label{flex:0 0 160px;margin-bottom:0;padding-right:.5rem;text-align:left}
+  .form-row.inline .input{flex:1;min-width:0}
+}
+
 .form-card textarea{min-height:120px}
+
+/* ensure inputs don't force horizontal scroll */
+.input, .form-card, .site-container, .container{max-width:100%}
+
+/* subtle helper for small informational text near labels */
+.label small{font-weight:400;color:var(--muted);font-size:.85rem;margin-left:.4rem}
 
 /* Input focus and validation */
 input:focus,textarea:focus,select:focus{outline:none;box-shadow:0 6px 20px rgba(23,101,209,0.08);border-color:var(--primary-600)}
 
-/* compact responsive forms */
+/* compact responsive forms and small-screen helpers */
+.narrow{max-width:680px;margin:0 auto;padding:0 1rem;width:100%;box-sizing:border-box}
+
+@media (max-width:900px){
+  /* make header wrap and reduce spacing for medium-small screens */
+  .site-header{padding:0.6rem 0.8rem;height:auto}
+  .site-header .container{flex-wrap:wrap;align-items:center}
+  .brand{flex:1}
+  .brand .wordmark{font-size:1.06rem}
+}
+
 @media (max-width:600px){
-  .form-card{padding:.85rem;margin:0 12px}
+  .form-card{padding:.85rem;margin:0 12px;width:100%}
+  .narrow{max-width:100%;padding:0 12px}
+  .brand .wordmark{font-size:1.02rem}
+  .logo{width:36px;height:36px}
+  .site-header{padding-top:10px;padding-bottom:10px}
+  .site-header .container{gap:.6rem}
+  .mobile-menu{right:.75rem;left:.75rem}
+  .job-list{grid-template-columns:1fr}
+  .nav-links a{font-size:.95rem;padding:.5rem .7rem}
+  .nav-links{display:none}
+  .hamburger{display:block}
 }
 
 /* Toast/Notification */
@@ -187,6 +267,11 @@ input:focus,textarea:focus,select:focus{outline:none;box-shadow:0 6px 20px rgba(
 .footer-links{display:flex;gap:1rem;align-items:center}
 .footer-links a{color:var(--muted);text-decoration:none;font-weight:600}
 .footer-copy{color:var(--muted);font-size:.95rem}
+
+@media (max-width:600px){
+  .site-footer .container{flex-direction:column;align-items:flex-start;gap:.6rem}
+  .footer-links{flex-wrap:wrap}
+}
 
 
 /* AOS helpers (AOS will add classes itself; these are small helpers) */

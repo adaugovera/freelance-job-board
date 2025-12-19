@@ -70,6 +70,8 @@ console.log('Database env loaded:', status);
 
 if (!status.DB_USER || !status.DB_NAME) {
   console.error('Database configuration missing DB_USER or DB_NAME in environment');
+  // Fail fast - do not allow the server to start with incomplete DB config
+  throw new Error('Missing DB_USER or DB_NAME in environment. Ensure backend/.env exists and contains DB_USER and DB_NAME');
 }
 
 const pool = new Pool({

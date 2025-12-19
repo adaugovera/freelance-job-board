@@ -1,5 +1,14 @@
-import dotenv from 'dotenv';
-dotenv.config(); // loads backend/.env when run from backend
+// Load .env robustly (handles running from project root or backend folder)
+import './loadEnv.js';
+
+// Global process event handlers to surface unexpected errors during development
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason && reason.stack ? reason.stack : reason);
+});
 
 import express from 'express';
 import cors from 'cors';
@@ -25,6 +34,9 @@ app.get('/', (req, res) => {
 });
 
 const PORT = Number(process.env.PORT) || 5000;
+
+// Helpful startup info (non-sensitive)
+console.log(`Starting API - environment: ${process.env.NODE_ENV || 'development'}, DB=${process.env.DB_NAME ? 'configured' : 'missing'}`);
 
 // ⬇️ FORCE IPv4 to avoid Node 22 localhost issues
 app.listen(PORT, '0.0.0.0', () => {

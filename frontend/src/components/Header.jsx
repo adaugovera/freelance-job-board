@@ -1,9 +1,26 @@
 import { Link } from "react-router-dom";
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // Top navigation with theme toggle and responsive mobile menu hooks
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Close on Escape, close when resizing above mobile breakpoint, and lock body scroll when open
+  useEffect(()=>{
+    const onKey = (e)=>{ if (e.key === 'Escape') setMobileOpen(false) }
+    const onResize = ()=>{ if (window.innerWidth > 900) setMobileOpen(false) }
+    document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
+    // lock body scroll while mobile menu is open
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return ()=>{
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', onResize)
+      document.body.style.overflow = ''
+    }
+  }, [mobileOpen])
+
+  const closeMenu = ()=> setMobileOpen(false)
 
   return (
     <header className="site-header" role="banner">
@@ -35,6 +52,7 @@ export default function Header() {
             data-mobile-toggle
             className="hamburger"
             aria-expanded={String(mobileOpen)}
+            aria-controls="mobile-menu"
             aria-label="Toggle mobile menu"
             onClick={()=> setMobileOpen(v => !v)}
           >
@@ -45,15 +63,21 @@ export default function Header() {
         </div>
       </div>
 
+      {/* backdrop */}
+      <div className={`mobile-backdrop ${mobileOpen ? 'open' : ''}`} onClick={closeMenu} aria-hidden={!mobileOpen} />
+
       <nav
+        id="mobile-menu"
         data-mobile-menu
         className={`mobile-menu ${mobileOpen ? 'open' : 'closed'}`}
         aria-hidden={!mobileOpen}
+        role="navigation"
+        aria-label="Mobile navigation"
       >
-        <Link to="/">Jobs</Link>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/profile">Profile</Link>
-        <Link to="/login">Login</Link>
+        <Link to="/" onClick={closeMenu}>Jobs</Link>
+        <Link to="/dashboard" onClick={closeMenu}>Dashboard</Link>
+        <Link to="/profile" onClick={closeMenu}>Profile</Link>
+        <Link to="/login" onClick={closeMenu}>Login</Link>
       </nav>
     </header>
   );

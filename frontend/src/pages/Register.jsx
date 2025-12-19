@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api/axios";
+import API, { healthCheck } from "../api/axios";
 import ErrorNotice from "../components/ErrorNotice";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "freelancer", gender: "other" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,6 +17,21 @@ export default function Register() {
     setError("");
     setSuccess("");
     try {
+      setLoading(true);
+      // Quick health probe before attempting registration to provide immediate feedback
+      try {
+        const diag = await healthCheck(2000);
+        if (!diag.data || !diag.data.ok) {
+          setError('Backend health check failed: ' + (diag.data?.errors?.map(e=>e.message).join('; ') || 'unknown'));
+          setLoading(false);
+          return;
+        }
+      } catch (probeErr) {
+        setError('Cannot reach backend at http://localhost:5000 — is the server running?');
+        setLoading(false);
+        return;
+      }
+
       // Send only fields the backend expects (name, email, password, role)
       const payload = {
         name: form.name,
@@ -31,11 +47,16 @@ export default function Register() {
       // Short delay to show success message, then go to profile
       setTimeout(() => navigate("/profile"), 800);
     } catch (err) {
-      const msg = err.response?.data?.message || "Registration failed";
-      // Prefer server-provided structured message, otherwise generic
-      const msgWithHint = (err.response?.data?.message) ? err.response.data.message : 'Registration failed. Please try again.';
-      const hint = err.response?.status === 409 ? ' — it looks like you already have an account.' : '';
-      setError(msgWithHint + hint);
+      // Network error (no response) - common when backend isn't running locally
+      if (err.request && !err.response) {
+        setError('Cannot reach backend at http://localhost:5000 — is the server running?');
+      } else {
+        const msgWithHint = err.response?.data?.message ? err.response.data.message : 'Registration failed. Please try again.';
+        const hint = err.response?.status === 409 ? ' — it looks like you already have an account.' : '';
+        setError(msgWithHint + hint);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,7 +99,10 @@ export default function Register() {
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <button className="btn btn-primary" type="submit">Register</button>
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading && <span className="spinner" aria-hidden="true"></span>}
+              {loading ? 'Registering...' : 'Register'}
+            </button>
           </div>
           {success && <p className="success" style={{ marginTop: 8 }}>{success}</p>}
           {/* Small inline hint for existing users */}
